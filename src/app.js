@@ -1,5 +1,6 @@
 import './styles.css';
 import { isValid } from './utils';
+import { Question } from './question';
 
 console.log('App working...');
 
@@ -7,6 +8,8 @@ const form = document.getElementById('form');
 
 const input = form.querySelector('#question-input');
 const submitBtn = form.querySelector('#submit');
+
+window.addEventListener('load', Question.renderList);
 
 form.addEventListener('submit', submitFormHandler);
 input.addEventListener('input', () => {
@@ -23,9 +26,11 @@ function submitFormHandler(event) {
 
     submitBtn.disabled = true;
     //Async request to server to save data
+    Question.create(question).then((data) => {
+      input.value = '';
+      input.className = '';
+      submitBtn.disabled = false;
+    });
     console.log('question', question);
-    input.value = '';
-    input.className = '';
-    submitBtn.disabled = false;
   }
 }
