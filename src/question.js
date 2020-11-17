@@ -16,7 +16,24 @@ export class Question {
       .then(addToLocalStorage)
       .then(Question.renderList);
   }
-
+  static fetch(token) {
+    if (!token) {
+      return Promise.resolve(`<p class="error">У вас нет доступа!</p>`);
+    }
+    return fetch(`https://podcast-native-js.firebaseio.com/questions.json?auth=${token}`)
+      .then((response) => response.json())
+      .then((response) => {
+        if (response && response.error) {
+          return `<p class="error">${response.error}</p>`;
+        }
+        return response
+          ? Object.keys(response).map((key) => ({
+              ...response[key],
+              id: key,
+            }))
+          : [];
+      });
+  }
   static renderList() {
     const question = getQuestionsFromLocalStorage();
     console.log('question', question);
@@ -26,6 +43,12 @@ export class Question {
 
     const list = document.getElementById('list');
     list.innerHTML = html;
+  }
+
+  static listToHTML(questions) {
+    return questions.length
+      ? `<ol>${questions.map((q) => `<li>${q.text}</li>`).join('')}</ol>`
+      : `<p>Вопросов пока нет</p>`;
   }
 }
 
